@@ -816,7 +816,7 @@ static void submit_extent_folio(struct btrfs_bio_ctrl *bio_ctrl,
 		}
 
 		if (bio_ctrl->wbc)
-			wbc_account_cgroup_owner(bio_ctrl->wbc, folio,
+			wbc_account_cgroup_owner(bio_ctrl->wbc, &folio->page,
 						 len);
 
 		size -= len;
@@ -1937,7 +1937,7 @@ static noinline_for_stack void write_one_eb(struct extent_buffer *eb,
 					    eb->start - folio_pos(folio));
 			ASSERT(ret);
 		}
-		wbc_account_cgroup_owner(wbc, folio, eb->len);
+		wbc_account_cgroup_owner(wbc, folio_page(folio, 0), eb->len);
 		folio_unlock(folio);
 	} else {
 		int num_folios = num_extent_folios(eb);
@@ -1967,7 +1967,8 @@ static noinline_for_stack void write_one_eb(struct extent_buffer *eb,
 						    eb->folio_size, 0);
 				ASSERT(ret);
 			}
-			wbc_account_cgroup_owner(wbc, folio, eb->folio_size);
+			wbc_account_cgroup_owner(wbc, folio_page(folio, 0),
+						 eb->folio_size);
 			wbc->nr_to_write -= folio_nr_pages(folio);
 			folio_unlock(folio);
 		}

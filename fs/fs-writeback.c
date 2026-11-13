@@ -964,16 +964,17 @@ EXPORT_SYMBOL_GPL(wbc_detach_inode);
 /**
  * wbc_account_cgroup_owner - account writeback to update inode cgroup ownership
  * @wbc: writeback_control of the writeback in progress
- * @folio: folio being written out
+ * @page: page being written out
  * @bytes: number of bytes being written out
  *
- * @bytes from @folio are about to written out during the writeback
+ * @bytes from @page are about to written out during the writeback
  * controlled by @wbc.  Keep the book for foreign inode detection.  See
  * wbc_detach_inode().
  */
-void wbc_account_cgroup_owner(struct writeback_control *wbc, struct folio *folio,
+void wbc_account_cgroup_owner(struct writeback_control *wbc, struct page *page,
 			      size_t bytes)
 {
+	struct folio *folio;
 	struct cgroup_subsys_state *css;
 	int id;
 
@@ -986,6 +987,7 @@ void wbc_account_cgroup_owner(struct writeback_control *wbc, struct folio *folio
 	if (!wbc->wb || wbc->no_cgroup_owner)
 		return;
 
+	folio = page_folio(page);
 	css = mem_cgroup_css_from_folio(folio);
 	/* dead cgroups shouldn't contribute to inode ownership arbitration */
 	if (!(css->flags & CSS_ONLINE))
