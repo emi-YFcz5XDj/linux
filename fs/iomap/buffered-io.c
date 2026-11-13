@@ -1865,7 +1865,7 @@ new_ioend:
 			wpc->ioend->io_size = end_pos - wpc->ioend->io_offset;
 	}
 
-	wbc_account_cgroup_owner(wbc, &folio->page, len);
+	wbc_account_cgroup_owner(wbc, folio, len);
 	return 0;
 }
 
